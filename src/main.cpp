@@ -197,7 +197,7 @@ std::string	SelectAIName( void ) {
 		case 1:
 			return("HAL-9000");
 		case 2:
-			return ("Agent Smith");
+			return ("AGENT SMITH");
 		case 3:
 			return ("ROY BATTY");
 		default:

@@ -162,12 +162,12 @@ std::string	Shadow::sneakAttack( unsigned int & Damages, std::string const targe
 
 	ss.str(std::string());
 	if (this->_Hiding) {
-		Damages = (std::rand() % this->_AttackDamage) + (std::rand() % 6) + (std::rand() % 6) + 3;
+		Damages += (std::rand() % this->_AttackDamage) + (std::rand() % 6) + (std::rand() % 6) + 3;
 		ss << " strike from the Dark and stab "<< target << " for " << Damages << " Damages!" << RC << std::endl;
 		ss << this->notHiding();
 	}
 	else {
-		Damages = (std::rand() % this->_AttackDamage) + 1;
+		Damages += (std::rand() % this->_AttackDamage) + 1;
 		ss << " stab " << target << " for " << Damages << " Damages!" << RC << std::endl;
 	}
 	return (ss.str());
@@ -190,6 +190,7 @@ void Shadow::attack(std::string const target) {
 			Char = Char->Next;
 		if (Char) {
 			OppHP = Char->getHitPoints();
+			Damages = Char->getBleed();
 			std::cout << RE << *this << this->sneakAttack(Damages, target);
 			Char->tryDodge();
 			Char->takeDamage(Damages);

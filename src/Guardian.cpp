@@ -160,6 +160,7 @@ void	Guardian::guardGate( void ) {
 	else if (!this->_GateKeeper) {
 		ss<< CY << *this << " is FIGHTING DEFENSIVELY" << RC << std::endl;
 		this->_GateKeeper = true;
+		this->_Absorbed = 0;
 	}
 	else
 		ss << CY << *this << " is already FIGHTING DEFENSIVELY\n\t\t\t\t\tShield Capacity left: " << Guardian::__ShieldCapacity - this->_Absorbed << RC << std::endl;

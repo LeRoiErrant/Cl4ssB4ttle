@@ -178,7 +178,7 @@ std::string	Character::getLog( void ) {
 	return (ss.str());
 }
 
-void	Character::Heal(unsigned int const amount) {
+void	Character::Heal( unsigned int const amount ) {
 	std::stringstream	ss;
 	
 	ss.str(std::string());
@@ -280,6 +280,7 @@ void	Character::Bleeding( void ) {
 		std::cout << this->getLog() << RE << *this << " is BLEEDING and loss " << this->_Bleed << " HP..." << RC << std::endl;
 		if (!this->_HitPoints)
 			std::cout << this->getLog() << RE << *this << " BLED to DEATH." << RC << std::endl;
+		this->_Bleed++;
 	}
 }
 
@@ -371,7 +372,7 @@ int	Character::PlayerAction( void ) {
 		}
 		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP"))
 			return (FORFEIT);
-		std::cout << RE << "Invalid command" << RC << std::endl;
+		std::cout << RE << "\t\t\t\t\tInvalid command" << RC << std::endl;
 	}
 
 	return (ATTACK);
