@@ -8,11 +8,18 @@
 # include <ctime>
 # include <unistd.h>
 
+# define BLINK "\033[1;5m"
+# define BOLD "\033[1m"
+# define ITAL "\033[3m"
+# define UNDRL "\033[4m"
 # define GR "\033[32;1m"
 # define RE "\033[31;1m"
+# define DR "\033[31;1;2m"
 # define YE "\033[33;1m"
 # define CY "\033[36;1m"
-# define LB "\094[36;1m"
+# define LG "\033[37;1;3m"
+# define DG "\033[90;1;3m"
+# define LB "\033[94;1m"
 # define MA "\001\033[1;95m\002"
 # define BL "\001\033[1;94m\002"
 # define RC "\033[0m"
@@ -27,19 +34,23 @@ enum Actions {
 };
 
 enum Fighter {
+	PLAYER,
 	COMPUTER,
-	PLAYER
+	FIGHTER = 0,
+	OPPONENT
 };
 
 class Character {
 	private: 
 		Character( void );
+		
+		void			(Character::*TakeTurn[2])( Character *Opponent );
 
 		static const unsigned int	__HitPoints = 10;
 		static const unsigned int	__Stamina = 10;
 		static const unsigned int	__AttackDamage = 2;
 		static const int			__Dodge = 5;
-	
+
 	protected:
 		std::string		_Name;
 		unsigned int	_HitPoints;
@@ -48,13 +59,15 @@ class Character {
 		unsigned int	_MaxStam;
 		unsigned int	_AttackDamage;
 		int				_Dodge;
+		bool			_Dodging;
+		bool			_hasDodged;
 		unsigned int	_Bleed;
 		bool			_Peace;
 
 	public:
 		Character(std::string name);
 		Character( Character const & src );
-		~Character( void );
+		virtual ~Character( void );
 
 		Character	&operator=( Character const & src );
 
@@ -65,17 +78,22 @@ class Character {
 		Character			*Previous;
 		Character			*Next;
 
-		void				Heal(unsigned int const amount);
-		virtual void		takeDamage(unsigned int const amount);
-		void				attack(std::string const target);
+		void				Heal( unsigned int const amount );
+		virtual void		takeDamage( unsigned int const amount );
+		void				attack( std::string const target );
 		void				Bleeding( void );
 		void				Dodging( void );
+		bool				tryDodge( void );
 		void				Resting( void );
 
-		std::string			getLog( void );
-		void				PlayerTurn( Character *Computer );
+		virtual std::string	getLog( void );
+
+		virtual void		NewTurn( int Fighter, Character *Opponent);
+		virtual std::string	askAction( void );
+
+		void				CharPlayerTurn( Character *Computer );
 		int					PlayerAction( void );
-		void				ComputerTurn( Character *Player );
+		void				CharComputerTurn( Character *Player );
 
 		void		setName( std::string const value );
 		void		setHitPoints( unsigned int const value );
@@ -94,6 +112,7 @@ class Character {
 		unsigned int	getBleed( void ) const;
 		bool			getPeace( void ) const;
 
+		virtual std::string	getClassType( void );
 };
 
 std::ostream	&operator<<( std::ostream & ostream, Character const & src );

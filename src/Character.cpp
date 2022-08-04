@@ -3,7 +3,7 @@
 Character *Character::FirstChar = NULL;
 Character *Character::LastChar = NULL;
 
-Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Bleed(0), _Peace(false) {
+Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false) {
 	if (!Character::FirstChar) {
 		Character::FirstChar = this;
 		Character::LastChar = this;
@@ -21,9 +21,11 @@ Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _M
 	this->Actions[DODGE] = "DODGE";
 	this->Actions[SPECIAL] = "EASTER EGG";
 	this->Actions[FORFEIT] = "FORFEIT";
+	this->TakeTurn[PLAYER] = &Character::CharPlayerTurn;
+	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 }
 
-Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Bleed(0), _Peace(false) {
+Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false) {
 	if (!Character::FirstChar) {
 		Character::FirstChar = this;
 		Character::LastChar = this;
@@ -41,6 +43,8 @@ Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints),
 	this->Actions[DODGE] = "DODGE";
 	this->Actions[SPECIAL] = "EASTER EGG";
 	this->Actions[FORFEIT] = "FORFEIT";
+	this->TakeTurn[PLAYER] = &Character::CharPlayerTurn;
+	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 }
 
 Character::Character( Character const & src ) {
@@ -51,8 +55,11 @@ Character::Character( Character const & src ) {
 	this->_MaxStam = Character::__Stamina;
 	this->_AttackDamage = src.getAttackDamage();
 	this->_Dodge = src.getDodge();
+	this->_Dodging = false;
 	this->_Bleed = src.getBleed();
 	this->_Peace = src.getPeace();
+	this->TakeTurn[PLAYER] = &Character::CharPlayerTurn;
+	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 	if (!Character::FirstChar) {
 		Character::FirstChar = this;
 		Character::LastChar = this;
@@ -71,12 +78,12 @@ Character::~Character( void ) {
 		this->Previous->Next = this->Next;
 		this->Next->Previous = this->Previous;
 	}
-	else if (this == Character::LastChar) {
+	if (this == Character::LastChar) {
 		if (this->Previous)
 			this->Previous->Next = NULL;
 		Character::LastChar = this->Previous;
 	}
-	else if (this == Character::FirstChar) {
+	if (this == Character::FirstChar) {
 		if (this->Next)
 			this->Next->Previous = NULL;
 		Character::FirstChar = this->Next;
@@ -185,6 +192,8 @@ void	Character::Heal(unsigned int const amount) {
 			this->_HitPoints += amount;
 			ss << GR << *this << " HEALED himself for " << amount << " Damages and has now " << this->_HitPoints << " HP left!" << RC << std::endl;
 		}
+		if (this->_Bleed)
+			this->_Bleed = 0;
 		this->_Stamina--;
 	}
 	else {
@@ -202,13 +211,16 @@ void		Character::takeDamage(unsigned int const amount) {
 	ss.str(std::string());
 	if (!this->_HitPoints)
 		ss << RE << *this << " has already been killed!" << RC << std::endl;
-	else if ((std::rand() % 100) < this->_Dodge)
+	else if (this->_hasDodged)
 		ss << BL << *this << " DODGE the attack and took no Damage!" << RC << std::endl;
 	else {
 		if (amount == 0)
 			ss << YE << *this << " was attacked but took no Damage!" << RC << std::endl;
 		else {
-			this->_HitPoints -= amount;
+			if (this->_HitPoints >= amount)
+				this->_HitPoints -= amount;
+			else
+				this->_HitPoints = 0;
 			if (!this->_HitPoints)
 				ss << RE << "Final blow! " << *this << " took " << amount << " Damages and has no HP left!" << RC << std::endl;
 			else
@@ -218,6 +230,7 @@ void		Character::takeDamage(unsigned int const amount) {
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
 	std::cout << this->getLog() << ss.str();
+	this->_hasDodged = false;
 }
 
 void Character::attack(std::string const target) {
@@ -237,6 +250,7 @@ void Character::attack(std::string const target) {
 		if (Char) {
 			Damages = 1 + (std::rand() % this->_AttackDamage);
 			std::cout << RE << *this << " slam " << target << " for " << Damages << " Damages!" << RC << std::endl;
+			Char->tryDodge();
 			Char->takeDamage(Damages);
 		}
 		else {
@@ -252,28 +266,43 @@ void Character::attack(std::string const target) {
 }
 
 void	Character::Bleeding( void ) {
-	if (this->_Bleed) {
-		this->_HitPoints -= this->_Bleed;
+	if (this->_Bleed and this->_HitPoints) {
+		if (this->_Bleed <= this->_HitPoints)
+			this->_HitPoints -= this->_Bleed;
+		else
+			this->_HitPoints = 0;
 		std::cout << this->getLog() << RE << *this << " is BLEEDING and loss " << this->_Bleed << " HP..." << RC << std::endl;
+		if (!this->_HitPoints)
+			std::cout << this->getLog() << RE << *this << " BLED to DEATH." << RC << std::endl;
 	}
+}
+
+bool	Character::tryDodge( void ) {
+	if ((std::rand() % 100) < this->_Dodge) {
+		this->_hasDodged = true;
+		return (true);
+	}
+	else
+		return (false);
 }
 
 void	Character::Dodging( void ) {
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
-		this->_Dodge = 25;
-		std::cout << getLog() << BL << *this << " focus on DODGING" << RC << std::endl;
+		this->_Dodge += 20;
+		this->_Dodging = true;
+		std::cout << this->getLog() << BL << *this << " focus on DODGING" << RC << std::endl;
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			std::cout << this->getLog() << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			std::cout << this->getLog() << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
 	}
 }
 
 void	Character::Resting( void ) {
-	int	amount = 1 + std::rand() % 4;
+	int	amount = 1 + std::rand() % 6;
 
 	if (this->_Stamina + amount > this->_MaxStam)
 		amount = this->_MaxStam - this->_Stamina;
@@ -284,15 +313,16 @@ void	Character::Resting( void ) {
 	else {
 		if (!this->_HitPoints)
 			std::cout << RE << *this << " has been killed..." << RC << std::endl;
-		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
 	}
 }
 
-void	Character::ComputerTurn( Character *Player ) {
+void	Character::CharComputerTurn( Character *Player ) {
 	int	percent = 0;
 
-	this->_Dodge = this->__Dodge;
+	if (!this->_Stamina) {
+		this->Resting();
+		return;
+	}
 	switch (std::rand() % 10) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + 1);
@@ -314,25 +344,32 @@ void	Character::ComputerTurn( Character *Player ) {
 	}
 }
 
+std::string	Character::askAction( void ) {
+	return ("Please select action ( ATTACK / HEAL / REST / DODGE ): ");
+}
+
 int	Character::PlayerAction( void ) {
 	std::string	cmd;
 	bool		ask;
 
 	ask = true;
+	std::cout << std::endl;
 	while (ask) {
-		std::cout << MA << "Please select action ( ATTACK / HEAL / REST / DODGE ):\n > " << RC;
+		std::cout << LB <<"\t\t" << this->askAction() << RC;
 		std::getline(std::cin, cmd);
 		for (int i = ATTACK; i <= FORFEIT; i++) {
-			if (!cmd.compare(this->Actions[i]))
+			if (!cmd.compare(this->Actions[i])) {
+				std::cout << std::endl;
 				return (i);
+			}
 		}
 		std::cout << RE << "Invalid command" << RC << std::endl;
 	}
+
 	return (ATTACK);
 }
 
-void	Character::PlayerTurn( Character *Computer ) {
-	this->_Dodge = this->__Dodge;
+void	Character::CharPlayerTurn( Character *Computer ) {
 	switch (PlayerAction()) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + 1);
@@ -354,3 +391,13 @@ void	Character::PlayerTurn( Character *Computer ) {
 	}
 }
 
+
+void	Character::NewTurn( int Fighter, Character *Opponent ) {
+	this->_Dodge = Character::__Dodge;
+	(this->*TakeTurn[Fighter])(Opponent);
+	this->Bleeding();
+}
+
+std::string	Character::getClassType( void ) {
+	return ("Commoner");
+}
