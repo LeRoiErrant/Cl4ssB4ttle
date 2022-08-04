@@ -3,7 +3,7 @@
 Character *Character::FirstChar = NULL;
 Character *Character::LastChar = NULL;
 
-Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false) {
+Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false), _Counter(false) {
 	if (!Character::FirstChar) {
 		Character::FirstChar = this;
 		Character::LastChar = this;
@@ -25,7 +25,7 @@ Character::Character( void ) : _Name("Unamed Hero"), _HitPoints(__HitPoints), _M
 	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 }
 
-Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false) {
+Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints), _MaxHP(__HitPoints), _Stamina(__Stamina), _MaxStam(__Stamina), _AttackDamage(__AttackDamage), _Dodge(__Dodge), _Dodging(false), _Bleed(0), _Peace(false), _Counter(false) {
 	if (!Character::FirstChar) {
 		Character::FirstChar = this;
 		Character::LastChar = this;
@@ -47,7 +47,7 @@ Character::Character( std::string name ) : _Name(name), _HitPoints(__HitPoints),
 	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 }
 
-Character::Character( Character const & src ) {
+Character::Character( Character const & src ) : _Dodging(false), _Bleed(0), _Peace(false), _Counter(false) {
 	this->_Name = src.getName();
 	this->_HitPoints = src.getHitPoints();
 	this->_MaxHP = Character::__HitPoints;
@@ -55,9 +55,6 @@ Character::Character( Character const & src ) {
 	this->_MaxStam = Character::__Stamina;
 	this->_AttackDamage = src.getAttackDamage();
 	this->_Dodge = src.getDodge();
-	this->_Dodging = false;
-	this->_Bleed = src.getBleed();
-	this->_Peace = src.getPeace();
 	this->TakeTurn[PLAYER] = &Character::CharPlayerTurn;
 	this->TakeTurn[COMPUTER] = &Character::CharComputerTurn;
 	if (!Character::FirstChar) {
@@ -97,9 +94,6 @@ Character	&Character::operator=( Character const & src ) {
 	this->_Stamina = src.getStamina();
 	this->_MaxStam = Character::__Stamina;
 	this->_AttackDamage = src.getAttackDamage();
-	this->_Dodge = src.getDodge();
-	this->_Bleed = src.getBleed();
-	this->_Peace = src.getPeace();
 	return (*this);
 }
 
@@ -163,6 +157,14 @@ bool	Character::getPeace( void ) const {
 	return (this->_Peace);
 }
 
+void	Character::setCounter( bool const value ) {
+	this->_Counter = value;
+}
+
+bool	Character::getCounter( void ) const {
+	return (this->_Counter);
+}
+
 std::ostream	&operator<<( std::ostream & ostream, Character const & src ) {
 	ostream << src.getName();
 	return (ostream);
@@ -172,7 +174,7 @@ std::string	Character::getLog( void ) {
 	std::stringstream	ss;
 
 	ss.str(std::string());
-	ss << "[ " << std::setw(12) << std::left << *this << RE << " " << std::setw(3) << std::right << this->_HitPoints << "  " << CY << std::setw(3) << std::right << this->_Stamina << RC << " ]\t";
+	ss << "\t[ " << std::setw(12) << std::left << *this << RE << " " << std::setw(3) << std::right << this->_HitPoints << "  " << CY << std::setw(3) << std::right << this->_Stamina << RC << " ]\t";
 	return (ss.str());
 }
 
@@ -182,10 +184,10 @@ void	Character::Heal(unsigned int const amount) {
 	ss.str(std::string());
 	if (this->_HitPoints and this->_Stamina) {
 		if (this->_HitPoints == this->_MaxHP) {
-			ss << GR << *this << " try to HEAL himself for " << amount << " Damages but already is at his max Health (Any extra HP is loss)" << RC << std::endl;
+			ss << GR << *this << " try to HEAL himself for " << amount << " Damages but already is at his max Health\n\t\t\t\t\t(Any extra HP is loss)" << RC << std::endl;
 		}
 		else if (this->_HitPoints + amount >= this->_MaxHP) {
-			ss << GR << *this << " HEALED himself for " << amount << " Damages and is back to max Health (Any extra HP is loss)" << RC << std::endl;
+			ss << GR << *this << " HEALED himself for " << amount << " Damages and is back to max Health\n\t\t\t\t\t(Any extra HP is loss)" << RC << std::endl;
 			this->_HitPoints = this->_MaxHP;
 		}
 		else {
@@ -252,6 +254,10 @@ void Character::attack(std::string const target) {
 			std::cout << RE << *this << " slam " << target << " for " << Damages << " Damages!" << RC << std::endl;
 			Char->tryDodge();
 			Char->takeDamage(Damages);
+			if (Char->getCounter()) {
+				Char->attack(this->getName());
+				Char->setCounter(false);
+			}
 		}
 		else {
 			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
@@ -302,7 +308,7 @@ void	Character::Dodging( void ) {
 }
 
 void	Character::Resting( void ) {
-	int	amount = 1 + std::rand() % 6;
+	int	amount = 2 + (std::rand() % 6) + (std::rand() % 6);
 
 	if (this->_Stamina + amount > this->_MaxStam)
 		amount = this->_MaxStam - this->_Stamina;
@@ -355,7 +361,7 @@ int	Character::PlayerAction( void ) {
 	ask = true;
 	std::cout << std::endl;
 	while (ask) {
-		std::cout << LB <<"\t\t" << this->askAction() << RC;
+		std::cout << LB <<"\t" << this->askAction() << RC;
 		std::getline(std::cin, cmd);
 		for (int i = ATTACK; i <= FORFEIT; i++) {
 			if (!cmd.compare(this->Actions[i])) {
@@ -363,6 +369,8 @@ int	Character::PlayerAction( void ) {
 				return (i);
 			}
 		}
+		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP"))
+			return (FORFEIT);
 		std::cout << RE << "Invalid command" << RC << std::endl;
 	}
 
@@ -391,10 +399,33 @@ void	Character::CharPlayerTurn( Character *Computer ) {
 	}
 }
 
+bool	Character::checkPeace( Character *Opponent ) {
+	bool			Peaceful = Opponent->getPeace();
+	unsigned int	heal;
+	unsigned int	rest;
+
+	if (Peaceful) {
+		heal = 1 + std::rand() % 4;
+		rest = 1 + std::rand() % 4;
+		if (this->_HitPoints + heal <= this->_MaxHP)
+			this->_HitPoints += heal;
+		else
+			this->_HitPoints = this->_MaxHP;
+		if (this->_Stamina + rest <= this->_MaxStam)
+			this->_Stamina += rest;
+		else
+			this->_Stamina = this->_MaxStam;
+		std::cout << this->getLog() << CY << *this << " is feeling peacefull and just want to rest" << std::endl;
+		std::cout << "\t\t\t\t\t" << *this << " regain " << heal << " Hit Points and " << rest << " Stamina" << RC << std::endl;
+		Opponent->setPeace(false);
+	}
+	return (Peaceful);
+}
 
 void	Character::NewTurn( int Fighter, Character *Opponent ) {
 	this->_Dodge = Character::__Dodge;
-	(this->*TakeTurn[Fighter])(Opponent);
+	if (!this->checkPeace(Opponent))
+		(this->*TakeTurn[Fighter])(Opponent);
 	this->Bleeding();
 }
 

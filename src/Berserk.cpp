@@ -66,7 +66,7 @@ void	Berserk::BersComputerTurn( Character *Player ) {
 			if (this->_HitPoints == this->_MaxHP)
 				healChance = 74;
 			if (percent > healChance)
-				this->Heal((std::rand() % 4) + 1);
+				this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
 			else
 				this->attack(Player->getName());
 			break;
@@ -84,7 +84,7 @@ void	Berserk::BersComputerTurn( Character *Player ) {
 			if (this->_HitPoints < (this->_MaxHP / 4))
 				healChance = 33;
 			if (percent < healChance)
-				this->Heal((std::rand() % 4) + 1);
+				this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
 			else 
 				this->attack(Player->getName());
 			break;
@@ -98,7 +98,7 @@ std::string	Berserk::askAction( void ) {
 void	Berserk::BersPlayerTurn( Character *Computer ) {
 	switch (PlayerAction()) {
 		case HEAL:
-			this->Heal((std::rand() % 4) + 1);
+			this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
 			break;
 		case REST:
 			this->Resting();
@@ -176,8 +176,8 @@ void	Berserk::CheckRage( void ) {
 void	Berserk::enrage( void ) {
 	if (!this->_Rage) {
 		this->_Rage = true;
-		this->_RD *= 3;
-		this->_RageDamage = 5;
+		this->_RD *= 2;
+		this->_RageDamage = 3;
 		std::cout << this->getLog() << DR << *this << " begin to " << RE << "RAGE" << RC <<std::endl;
 	}
 }
@@ -185,7 +185,7 @@ void	Berserk::enrage( void ) {
 void	Berserk::calmDown( void ) {
 	if (this->_Rage) {
 		this->_Rage = false;
-		this->_RD /= 3;
+		this->_RD /= 2;
 		this->_RageDamage = 0;
 		std::cout << this->getLog() << DR << *this << " calmed down..." << RC << std::endl;
 	}
@@ -209,6 +209,10 @@ void Berserk::attack(std::string const target) {
 			std::cout << RE << *this << " pounce on " << target << " with his axe for " << Damages << " Damages!" << RC << std::endl;
 			Char->tryDodge();
 			Char->takeDamage(Damages);
+			if (Char->getCounter()) {
+				Char->attack(this->getName());
+				Char->setCounter(false);
+			}
 		}
 		else {
 			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
@@ -227,7 +231,8 @@ void	Berserk::NewTurn( int Fighter, Character *Opponent ) {
 	this->CheckRage();
 	if (this->_Dodging)
 		this->_Dodge -= 20;
-	(this->*TakeTurn[Fighter])(Opponent);
+	if (!this->checkPeace(Opponent))
+		(this->*TakeTurn[Fighter])(Opponent);
 	this->Bleeding();
 	this->CheckRage();
 }
@@ -256,7 +261,7 @@ void	Berserk::headbutt( std::string const target) {
 				else
 					Char->setStamina(0);
 			}
-			std::cout << this->getLog() << RE << *this << " try to HEADBUTT " << target << ".\n\t\t\t\t" << *this << " loose " << Damages[FIGHTER] << " and attack " << target << " for " << Damages[OPPONENT] << " Damages and " << Exhaust << " Stamina Loss" << RC << std::endl;
+			std::cout << this->getLog() << RE << *this << " try to HEADBUTT " << target << "\n\t\t\t\t\t" << *this << " loose " << Damages[FIGHTER] << " HP\n\t\t\t\t\tand attack " << target << " for " << Damages[OPPONENT] << " Damages and " << Exhaust << " Stamina Loss" << RC << std::endl;
 			Char->takeDamage(Damages[OPPONENT]);
 		}
 		else {
@@ -275,7 +280,7 @@ std::string	Berserk::getLog( void ) {
 	std::stringstream	ss;
 
 	ss.str(std::string());
-	ss << BOLD << "\t\t[ ";
+	ss << BOLD << "\t[ ";
 	if (this->_Rage)
 		ss << RE;
 	ss << "B-" << std::setw(12) << std::left << *this << RE << " " << std::setw(3) << std::right << this->_HitPoints << "  " << CY << std::setw(3) << std::right << this->_Stamina << RC << BOLD << " ]\t" << RC;

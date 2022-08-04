@@ -67,7 +67,7 @@ void	Shadow::ShadComputerTurn( Character *Player ) {
 			if (this->_HitPoints == this->_MaxHP)
 				healChance = 74;
 			if (percent > healChance)
-				this->Heal((std::rand() % 4) + 1);
+				this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
 			else
 				this->attack(Player->getName());
 			break;
@@ -88,8 +88,8 @@ void	Shadow::ShadComputerTurn( Character *Player ) {
 			if (this->_HitPoints < (this->_MaxHP / 2))
 				healChance = 33;
 			if (percent < healChance)
-				this->Heal((std::rand() % 4) + 1);
-			else if (percent < (healChance + hideChance))
+				this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
+			else if (percent < (healChance + hideChance) and !this->_Hiding)
 				this->hide();
 			else 
 				this->attack(Player->getName());
@@ -104,7 +104,7 @@ std::string	Shadow::askAction( void ) {
 void	Shadow::ShadPlayerTurn( Character *Computer ) {
 	switch (PlayerAction()) {
 		case HEAL:
-			this->Heal((std::rand() % 4) + 1);
+			this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
 			break;
 		case REST:
 			this->Resting();
@@ -193,6 +193,10 @@ void Shadow::attack(std::string const target) {
 			std::cout << RE << *this << this->sneakAttack(Damages, target);
 			Char->tryDodge();
 			Char->takeDamage(Damages);
+			if (Char->getCounter()) {
+				Char->attack(this->getName());
+				Char->setCounter(false);
+			}
 				if (Char->getHitPoints() < OppHP)
 					Char->setBleed(Char->getBleed() + 1);
 		}
@@ -238,7 +242,8 @@ void	Shadow::refreshDodge( void ) {
 
 void	Shadow::NewTurn( int Fighter, Character *Opponent ) {
 	this->refreshDodge();
-	(this->*TakeTurn[Fighter])(Opponent);
+	if (!this->checkPeace(Opponent))
+		(this->*TakeTurn[Fighter])(Opponent);
 	this->Bleeding();
 }
 
@@ -246,7 +251,7 @@ std::string	Shadow::getLog( void ) {
 	std::stringstream	ss;
 
 	ss.str(std::string());
-	ss << BOLD << "\t\t[ ";
+	ss << BOLD << "\t[ ";
 	if (this->_Hiding)
 		ss << DG;
 	ss << "S-" << std::setw(12) << std::left << *this << RE << " " << std::setw(3) << std::right << this->_HitPoints << "  " << CY << std::setw(3) << std::right << this->_Stamina << RC << BOLD << " ]\t" << RC;

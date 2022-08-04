@@ -11,13 +11,14 @@ class Guardian : public Character {
 
 		bool			_GateKeeper;
 		unsigned int	_Absorbed;
-		unsigned int	_ShieldCapacity;
-		int				_PeaceAura;
 
 		static const unsigned int	__HitPoints = 50;
 		static const unsigned int	__Stamina = 20;
 		static const unsigned int	__AttackDamage = 8;
 		static const int			__Dodge = 5;
+		static const unsigned int	__ShieldCapacity = 10;
+		static const int			__PeaceAura = 15;
+		static const int			__Counter = 15;
 
 	public:
 		Guardian( std::string name);
@@ -26,24 +27,27 @@ class Guardian : public Character {
 
 		Guardian	&operator=( Guardian const & src );
 
-		void		setGateKeeper( bool const value );
-		void		setAbsorbed( unsigned int const value );
-		void		setShieldCapacity( unsigned int const value );
-		void		setPeaceAura( int const value );
+		void			setGateKeeper( bool const value );
+		void			setAbsorbed( unsigned int const value );
+		void			setShieldCapacity( unsigned int const value );
+		void			setPeaceAura( int const value );
 
 		bool			getGateKeeper( void ) const;
 		unsigned int	getAbsorbed( void ) const;
 		unsigned int	getShieldCapacity( void ) const;
 		int				getPeaceAura( void ) const;
 
-		void			attack(std::string const target);
-		virtual void	takeDamage(unsigned int const amount);
+		void			attack( std::string const target );
+		virtual void	takeDamage( unsigned int const amount );
+		void			absorbDamage( unsigned int amount );
+		void			guardGate( void );
 
 		virtual	void		NewTurn( int Fighter, Character *Opponent);
 		virtual std::string	askAction( void );
 
 		void	GuardPlayerTurn( Character *Computer );
 		void	GuardComputerTurn( Character *Player );
+		
 		virtual std::string	getLog( void );
 		virtual std::string	getClassType( void );
 };
