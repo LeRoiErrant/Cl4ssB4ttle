@@ -23,7 +23,8 @@ SRC = $(SRC_DIR)/main.cpp \
 	$(SRC_DIR)/Character.cpp \
 	$(SRC_DIR)/Shadow.cpp \
 	$(SRC_DIR)/Berserk.cpp \
-	$(SRC_DIR)/Guardian.cpp
+	$(SRC_DIR)/Guardian.cpp \
+	$(SRC_DIR)/Sed.cpp
 
 OBJS = $(SRC:.cpp=.o)
 

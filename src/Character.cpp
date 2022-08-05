@@ -383,6 +383,7 @@ int	Character::PlayerAction( void ) {
 	while (ask) {
 		std::cout << BOLD << ITAL <<"\t" << this->askAction() << RC;
 		std::getline(std::cin, cmd);
+		cmd = Sed::strToUpper(cmd);
 		if (std::cin.eof()) {
 			std::cout << std::endl;
 			std::exit(0) ;

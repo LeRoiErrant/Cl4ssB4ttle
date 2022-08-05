@@ -7,6 +7,7 @@
 # include <cstdlib>
 # include <ctime>
 # include <unistd.h>
+# include "Sed.hpp"
 
 # define BLINK "\033[1;5m"
 # define BOLD "\033[1m"

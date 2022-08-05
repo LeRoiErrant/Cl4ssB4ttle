@@ -104,6 +104,7 @@ std::string	askName( void ) {
 	while (ask and !std::cin.eof()) {
 		std::cout << BOLD << "\t\tPlease enter your Fighter's Name: " << RC;
 		std::getline(std::cin, cmd);
+		cmd = Sed::strReplace(cmd, "\t", " ");
 		if (std::cin.eof()) {
 			std::cout << std::endl;
 			std::exit(0) ;
@@ -194,6 +195,7 @@ Character	*SelectCharacter( void ) {
 	while (!Player and !std::cin.eof()) {
 		std::cout << BOLD << "\t\tSelect your Class: " << RC;
 		std::getline(std::cin, cmd);
+		cmd = Sed::strToUpper(cmd);
 		if (std::cin.eof()) {
 			std::cout << std::endl;
 			std::exit(0) ;
