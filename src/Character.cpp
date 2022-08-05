@@ -85,6 +85,25 @@ Character::~Character( void ) {
 			this->Next->Previous = NULL;
 		Character::FirstChar = this->Next;
 	}
+	this->_Name.clear();
+	this->_HitPoints = 0;
+	this->_MaxHP = 0;
+	this->_Stamina = 0;
+	this->_MaxStam = 0; 
+	this->_AttackDamage = 0;
+	this->_Dodge = 0;
+	this->_Dodging = false;
+	this->_Bleed = 0;
+	this->_Peace = false;
+	this->_Counter = false;
+	this->TakeTurn[PLAYER] = NULL;
+	this->TakeTurn[COMPUTER] = NULL;
+	this->Actions[ATTACK].clear();
+	this->Actions[HEAL].clear();
+	this->Actions[REST].clear();
+	this->Actions[DODGE].clear();
+	this->Actions[SPECIAL].clear();
+	this->Actions[FORFEIT].clear();
 }
 
 Character	&Character::operator=( Character const & src ) {
@@ -184,7 +203,7 @@ void	Character::Heal( unsigned int const amount ) {
 	ss.str(std::string());
 	if (this->_HitPoints and this->_Stamina) {
 		if (this->_HitPoints == this->_MaxHP) {
-			ss << GR << *this << " try to HEAL himself for " << amount << " Damages but already is at his max Health\n\t\t\t\t\t(Any extra HP is loss)" << RC << std::endl;
+			ss << GR << *this << " try to HEAL himself for " << amount << " Damages\n\t\t\t\t\tbut already is at his max Health" << RC << std::endl;
 		}
 		else if (this->_HitPoints + amount >= this->_MaxHP) {
 			ss << GR << *this << " HEALED himself for " << amount << " Damages and is back to max Health\n\t\t\t\t\t(Any extra HP is loss)" << RC << std::endl;
@@ -362,15 +381,19 @@ int	Character::PlayerAction( void ) {
 	ask = true;
 	std::cout << std::endl;
 	while (ask) {
-		std::cout << LB <<"\t" << this->askAction() << RC;
+		std::cout << BOLD << ITAL <<"\t" << this->askAction() << RC;
 		std::getline(std::cin, cmd);
+		if (std::cin.eof()) {
+			std::cout << std::endl;
+			std::exit(0) ;
+		}
 		for (int i = ATTACK; i <= FORFEIT; i++) {
 			if (!cmd.compare(this->Actions[i])) {
 				std::cout << std::endl;
 				return (i);
 			}
 		}
-		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP"))
+		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP") or std::cin.eof())
 			return (FORFEIT);
 		std::cout << RE << "\t\t\t\t\tInvalid command" << RC << std::endl;
 	}
@@ -392,7 +415,7 @@ void	Character::CharPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
 			break;
 		default:
 			this->attack(Computer->getName());

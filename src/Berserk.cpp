@@ -21,6 +21,12 @@ Berserk::Berserk( Berserk const & src ) : Character(src), _Rage(false), _RD(2), 
 }
 
 Berserk::~Berserk( void ) {
+	this->_Rage = false;
+	this->_RD = 2;
+	this->_RageDamage = 0;
+	this->TakeTurn[PLAYER] = NULL;
+	this->TakeTurn[COMPUTER] = NULL;
+	this->Actions[SPECIAL].clear(); 
 }
 
 Berserk	&Berserk::operator=( Berserk const & src ) {
@@ -112,7 +118,7 @@ void	Berserk::BersPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
 			break;
 		default:
 			this->attack(Computer->getName());
@@ -263,6 +269,10 @@ void	Berserk::headbutt( std::string const target) {
 			}
 			std::cout << this->getLog() << RE << *this << " try to HEADBUTT " << target << "\n\t\t\t\t\t" << *this << " loose " << Damages[FIGHTER] << " HP\n\t\t\t\t\tand attack " << target << " for " << Damages[OPPONENT] << " Damages and " << Exhaust << " Stamina Loss" << RC << std::endl;
 			Char->takeDamage(Damages[OPPONENT]);
+			if (Char->getCounter()) {
+				Char->attack(this->getName());
+				Char->setCounter(false);
+			}
 		}
 		else {
 			std::cout << this->getLog() << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;

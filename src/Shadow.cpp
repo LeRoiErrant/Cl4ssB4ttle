@@ -29,6 +29,10 @@ Shadow::Shadow( Shadow const & src ) : Character(src), _Hiding(false) {
 }
 
 Shadow::~Shadow( void ) {
+	this->_Hiding = false;
+	this->TakeTurn[PLAYER] = NULL;
+	this->TakeTurn[COMPUTER] = NULL;
+	this->Actions[SPECIAL].clear();
 }
 
 Shadow	&Shadow::operator=( Shadow const & src ) {
@@ -118,7 +122,7 @@ void	Shadow::ShadPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
 			break;
 		default:
 			this->attack(Computer->getName());
@@ -214,9 +218,18 @@ void Shadow::attack(std::string const target) {
 }
 
 void	Shadow::hide( void ) {
-	this->_Hiding = true;
-	this->_Dodge = 66;
-	std::cout << getLog() << DG << *this << " is HIDING in the Shadows..." << RC << std::endl;
+	if (this->_Stamina and this->_HitPoints) {
+		this->_Hiding = true;
+		this->_Dodge = 66;
+		std::cout << getLog() << DG << *this << " is HIDING in the Shadows..." << RC << std::endl;
+		this->_Stamina--;
+	}
+	else {
+		if (!this->_HitPoints)
+			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+		else
+			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+	}
 }
 
 std::string	Shadow::notHiding( void ) {

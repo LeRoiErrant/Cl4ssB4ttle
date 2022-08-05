@@ -101,10 +101,14 @@ std::string	askName( void ) {
 	bool		ask;
 	
 	ask = true;
-	while (ask) {
+	while (ask and !std::cin.eof()) {
 		std::cout << BOLD << "\t\tPlease enter your Fighter's Name: " << RC;
 		std::getline(std::cin, cmd);
-		if (!cmd.length()) {
+		if (std::cin.eof()) {
+			std::cout << std::endl;
+			std::exit(0) ;
+		}
+		if (!cmd.length() and !std::cin.eof()) {
 			std::cout << RE << "\t\tEmpty name not allowed" << RC << std::endl;
 		}
 		else if (cmd.length() > 12) {
@@ -112,6 +116,8 @@ std::string	askName( void ) {
 			scmd.append(".");
 			return (scmd);
 		}
+		else if(std::cin.eof())
+			return("Unamed");
 		else
 			return (cmd);
 	}
@@ -124,11 +130,15 @@ std::string	askName( void ) {
 	
 	ask = true;
 	while (ask) {
-		std::cout << BOLD << "\n\t\tWould you like to play again ( y / N )" << BLINK << ": " << RC;
+		std::cout << BOLD << "\n\t\t\t\t    Would you like to play again ( y / N )" << BLINK << ": " << RC;
 		std::getline(std::cin, cmd);
+		if (std::cin.eof()) {
+			std::cout << std::endl;
+			std::exit(0) ;
+		}
 		if (!cmd.compare("y"))
 			return (true);
-		else if (!cmd.compare("N"))
+		else if (!cmd.compare("N") or std::cin.eof())
 			return (false);
 		else
 			std::cout << RE << "\t\tInvalid answer" << RC << std::endl;
@@ -145,7 +155,11 @@ bool	askReplay( void ) {
 		std::cout << BOLD << "\n\t\t\t\t\t" << BLINK << "< Press ENTER to play again > \n" << RC << HDDN;
 		std::getline(std::cin, cmd);
 		std::cout << RC << std::endl;
-		if (!cmd.compare("EXIT42"))
+		if (std::cin.eof()) {
+			std::cout << std::endl;
+			std::exit(0) ;
+		}
+		else if (!cmd.compare("EXIT42"))
 			return (false);
 		else
 			return (true);
@@ -155,9 +169,9 @@ bool	askReplay( void ) {
 
 void	CharacterClassInfo( void ) {
 	std::cout << "\t\t" << BOLD << UNDRL << " " << std::setw(15) << "CHARACTER CLASS" << " | " << std::setw(10) << "Hit Points" << " | " << std::setw(6) << "ATTACK" << " | " << std::setw(8) << "ACTIVE" << " | " << std::setw(12) << "PASSIVE(1)" << " | " << std::setw(15) << "PASSIVE(2)" << " " << RC << std::endl;
-	std::cout << "\t\t " << BOLD << DGB << std::setw(15) << "SHADOW" << WH << " | " << std::setw(10) << "40" << " | " << std::setw(6) << "D4" << " | " << std::setw(8) << "HIDE" << " | " << std::setw(12) << "SNEAK ATTACK" << " | " << std::setw(15) << "BLEEDING STRIKE" << std::endl;
-	std::cout << "\t\t " << BOLD << RE << std::setw(15) << "BERSERK" << WH << " | " << std::setw(10) << "60" << " | " << std::setw(6) << "D12" << " | " << std::setw(8) << "HEADBUTT" << " | " << std::setw(12) << "RAGE" << " | " << std::setw(15) << "THICK SKIN" << std::endl;
-	std::cout << "\t\t " << BOLD << CY << std::setw(15) << "GUARDIAN" << WH << " | " << std::setw(10) << "50" << " | " << std::setw(6) << "D8" << " | " << std::setw(8) << "GUARD" << " | " << std::setw(12) << "COUNTER" << " | " << std::setw(15) << "PEACEFUL AURA" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "1." << DGB << std::setw(10) << "SHADOW" << WH << " | " << std::setw(10) << "40" << " | " << std::setw(6) << "D4" << " | " << std::setw(8) << "HIDE" << " | " << std::setw(12) << "SNEAK ATTACK" << " | " << std::setw(15) << "BLEEDING STRIKE" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "2." << RE << std::setw(10) << "BERSERK" << WH << " | " << std::setw(10) << "60" << " | " << std::setw(6) << "D12" << " | " << std::setw(8) << "HEADBUTT" << " | " << std::setw(12) << "RAGE" << " | " << std::setw(15) << "THICK SKIN" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "3." << CY << std::setw(10) << "GUARDIAN" << WH << " | " << std::setw(10) << "50" << " | " << std::setw(6) << "D8" << " | " << std::setw(8) << "GUARD" << " | " << std::setw(12) << "COUNTER" << " | " << std::setw(15) << "PEACEFUL AURA" << std::endl;
 	std::cout << std::endl;
 }
 
@@ -177,14 +191,18 @@ Character	*SelectCharacter( void ) {
 	Character	*Player = NULL;
 	
 	CharacterClassInfo();
-	while (!Player) {
+	while (!Player and !std::cin.eof()) {
 		std::cout << BOLD << "\t\tSelect your Class: " << RC;
 		std::getline(std::cin, cmd);
-		if (!cmd.compare("SHADOW"))
+		if (std::cin.eof()) {
+			std::cout << std::endl;
+			std::exit(0) ;
+		}
+		else if (!cmd.compare("SHADOW") or !cmd.compare("1"))
 			Player = new Shadow(askName());
-		else if (!cmd.compare("BERSERK"))
+		else if (!cmd.compare("BERSERK") or !cmd.compare("2"))
 			Player = new Berserk(askName());
-		else if (!cmd.compare("GUARDIAN"))
+		else if (!cmd.compare("GUARDIAN") or !cmd.compare("3"))
 			Player = new Guardian(askName());
 		else
 			std::cout << RE << "\t\tInvalid answer" << RC << std::endl;

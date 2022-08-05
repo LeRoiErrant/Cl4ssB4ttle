@@ -29,6 +29,11 @@ Guardian::Guardian( Guardian const & src ) : Character(src), _GateKeeper(false),
 }
 
 Guardian::~Guardian( void ) {
+	this->_GateKeeper = false;
+	this->_Absorbed = 0;
+	this->TakeTurn[PLAYER] = NULL;
+	this->TakeTurn[COMPUTER] = NULL;
+	this->Actions[SPECIAL].clear();
 }
 
 Guardian	&Guardian::operator=( Guardian const & src ) {
@@ -86,7 +91,7 @@ void	Guardian::absorbDamage( unsigned int amount ) {
 		absorbed = Guardian::__ShieldCapacity - this->_Absorbed;
 		damage = amount - absorbed;
 		this->_Stamina -= absorbed;
-		ss << CY << "Maximum Shield Capacity exceeded. " << absorbed << " Damages absorbed and " << damage << " Damages pierced." << RC << std::endl;
+		ss << CY << "Maximum Shield Capacity exceeded.\n\t\t\t\t\t" << absorbed << " Damages absorbed and " << damage << " Damages pierced." << RC << std::endl;
 		this->_GateKeeper = false;
 		this->_Absorbed = 0;
 	}
@@ -112,15 +117,13 @@ void	Guardian::takeDamage(unsigned int amount) {
 	bool				shield = this->_GateKeeper;
 
 	ss.str(std::string());
-	if (!this->_HitPoints) {
+	if (!this->_HitPoints)
 		ss << RE << *this << " has already been killed!" << RC << std::endl;
-	}
-	else if (this->_hasDodged) {
+
+	else if (this->_hasDodged)
 		ss << BL << *this << " DODGE the attack and took no Damage!" << RC << std::endl;
-	}
-	else if (this->_GateKeeper) { 
+	else if (this->_GateKeeper)
 		absorbDamage(amount);
-	}
 	else {
 		if (amount == 0)
 			ss << YE << *this << " was attacked but took no Damage!" << RC << std::endl;
@@ -138,7 +141,7 @@ void	Guardian::takeDamage(unsigned int amount) {
 	}
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
-	if (!shield)
+	if (!shield or this->_hasDodged)
 		std::cout << this->getLog() << ss.str();
 	if ((std::rand() % 100) < Guardian::__PeaceAura) {
 		std::cout << this->getLog() << CY << *this << "'s Peaceful Aura benumb his Opponent" << RC << std::endl;
@@ -147,8 +150,10 @@ void	Guardian::takeDamage(unsigned int amount) {
 	if (shield and (std::rand() % 100) < Guardian::__Counter) {
 		std::cout << this->getLog() << RE << *this << " counter attack!" << RC << std::endl;
 		this->_Counter = true;
+		this->_AttackDamage = 12;
 		this->_Stamina++;
 	}
+	this->_hasDodged = false;
 }
 
 void	Guardian::guardGate( void ) {
@@ -169,7 +174,7 @@ void	Guardian::guardGate( void ) {
 
 void Guardian::attack(std::string const target) {
 	Character		*Char;
-	unsigned int	Damages = 1 + std::rand() % 8;
+	unsigned int	Damages = 2 + (std::rand() % this->_AttackDamage) + (std::rand() % this->_AttackDamage);
 	bool			attack = false;
 	
 	if (this->_HitPoints and this->_Stamina) {
@@ -203,6 +208,8 @@ void Guardian::attack(std::string const target) {
 }
 
 void	Guardian::NewTurn( int Fighter, Character *Opponent ) {
+	if (this->_AttackDamage != Guardian::__AttackDamage)
+		this->_AttackDamage = Guardian::__AttackDamage;
 	if (this->_Dodging)
 		this->_Dodge -= 20;
 	if (!this->checkPeace(Opponent))
@@ -288,7 +295,7 @@ void	Guardian::GuardPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
 			break;
 		default:
 			this->attack(Computer->getName());
