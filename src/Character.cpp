@@ -396,7 +396,7 @@ int	Character::PlayerAction( void ) {
 		}
 		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP") or std::cin.eof())
 			return (FORFEIT);
-		std::cout << RE << "\t\t\t\t\tInvalid command" << RC << std::endl;
+		std::cout << RE << "\tInvalid command" << RC << std::endl;
 	}
 
 	return (ATTACK);

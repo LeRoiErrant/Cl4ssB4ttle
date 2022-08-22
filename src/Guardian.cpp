@@ -99,7 +99,7 @@ void	Guardian::absorbDamage( unsigned int amount ) {
 		absorbed = this->_Stamina;
 		damage = amount - absorbed;
 		this->_Stamina = 0;
-		ss << CY << "No more Stamina to withstand Damages. " << absorbed << " Damges absorbed and " << damage << " Damages pierced." << RC << std::endl;
+		ss << CY << "No more Stamina to withstand Damages.\n\t\t\t\t\t" << absorbed << " Damges absorbed and " << damage << " Damages pierced." << RC << std::endl;
 		this->_GateKeeper = false;
 		this->_Absorbed = 0;
 	}
