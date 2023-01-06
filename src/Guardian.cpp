@@ -220,6 +220,7 @@ void	Guardian::NewTurn( int Fighter, Character *Opponent ) {
 std::string	Guardian::getLog( void ) {
 	std::stringstream	ss;
 
+	usleep(500000);
 	ss.str(std::string());
 	ss << BOLD << "\t[ ";
 	if (this->_GateKeeper)

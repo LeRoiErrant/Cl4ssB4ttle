@@ -264,6 +264,7 @@ void	Shadow::NewTurn( int Fighter, Character *Opponent ) {
 std::string	Shadow::getLog( void ) {
 	std::stringstream	ss;
 
+	usleep(500000);
 	ss.str(std::string());
 	ss << BOLD << "\t[ ";
 	if (this->_Hiding)

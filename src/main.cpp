@@ -61,6 +61,7 @@ void	versusBattle( Character *Player, Character *Computer ) {
 		std::cout << BOLD << ITAL << "Player " << *Player << " goes First" << RC << std::endl;
 	while (StaminaLeft and !KnockOut) {
 		if (Turn == COMPUTER) {
+			std::cout << BOLD << ITAL << "\n\t\tComputer " << *Computer << " is thinking\n" << RC << std::endl;
 			Computer->NewTurn(COMPUTER, Player);
 			Turn = PLAYER;
 		}
@@ -283,13 +284,18 @@ int	main( void ) {
 	while (Play) {
 		std::system("clear");
 		Title();
+
+		std::cout << ITAL << RE << "\n\t\t\tChoose a Class and defeit your opponent!\t\n" << RC << std::endl;
+
 		std::cout << BOLD << ITAL << UNDRL << "\t\tPlayer Class Selection" << RC << BOLD << ": \n" << RC << std::endl;
 		Character	*Player = SelectCharacter();
 		if (!Player) {
 			std::cout << "\t\tFailed to select Character" << std::endl;
 			return 0;
 		}
+		usleep(500000);
 		std::cout << BOLD << ITAL << UNDRL << "\n\t\tComputer Class Selection" << RC << BOLD << ": " << RC;
+		usleep(500000);
 		Character	*Computer = SelectAICharacter(Player);
 		if (!Computer) {
 			std::cout << "\t\tFailed to create Computer" << std::endl;

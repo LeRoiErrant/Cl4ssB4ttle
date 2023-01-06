@@ -289,6 +289,7 @@ void	Berserk::headbutt( std::string const target) {
 std::string	Berserk::getLog( void ) {
 	std::stringstream	ss;
 
+	usleep(500000);
 	ss.str(std::string());
 	ss << BOLD << "\t[ ";
 	if (this->_Rage)
