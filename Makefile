@@ -11,7 +11,7 @@ UTILS_DIR =
 #						COMPILATION AND LINK FLAGS							   #
 # **************************************************************************** #
 
-CC = g++-11
+CC = g++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 LIB_FLAGS = 
 

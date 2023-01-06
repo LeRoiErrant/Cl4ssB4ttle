@@ -6,7 +6,7 @@
 /*   By: vheran <vheran@student.42lausanne.ch>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/25 08:39:34 by vheran            #+#    #+#             */
-/*   Updated: 2022/08/05 12:41:59 by vheran           ###   ########.fr       */
+/*   Updated: 2023/01/06 16:06:11 by vheran           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,5 +117,3 @@ void	Sed::replace(std::string const &filename, std::string const &search, std::s
 	ifs.close();
 	ofs.close();
 }
-
-
