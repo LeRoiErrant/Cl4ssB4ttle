@@ -66,7 +66,7 @@ unsigned int	Guardian::getAbsorbed( void ) const {
 void	Guardian::absorbDamage( unsigned int amount ) {
 	unsigned int		absorbed(0);
 	unsigned int		damage(0);
-	std::stringstream	ss;
+	std::ostringstream	ss;
 	
 	ss.str(std::string());
 	amount /= 2;
@@ -107,13 +107,14 @@ void	Guardian::absorbDamage( unsigned int amount ) {
 		ss << CY << "\t\t\t\t\t" << *this << " is not FIGHTING DEFENSIVELY anymore" << RC << std::endl;
 	else
 		ss << CY << "\t\t\t\t\tShield capacity left: " << (Guardian::__ShieldCapacity - this->_Absorbed) << RC << std::endl;
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog();
+	slow_print(ss, 50000);
 	if (damage)
 		this->takeDamage(damage);
 }
 
 void	Guardian::takeDamage(unsigned int amount) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 	bool				shield = this->_GateKeeper;
 
 	ss.str(std::string());
@@ -141,14 +142,22 @@ void	Guardian::takeDamage(unsigned int amount) {
 	}
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
-	if (!shield or this->_hasDodged)
-		std::cout << this->getLog() << ss.str();
+	if (!shield or this->_hasDodged) {
+		std::cout << this->getLog();
+		slow_print(ss, 50000);
+	}
 	if ((std::rand() % 100) < Guardian::__PeaceAura) {
-		std::cout << this->getLog() << CY << *this << "'s Peaceful Aura benumb his Opponent" << RC << std::endl;
+		std::cout << this->getLog();
+		std::ostringstream peace;
+		peace << CY << *this << "'s Peaceful Aura benumb his Opponent" << RC << std::endl;
+		slow_print(peace, 50000);
 		this->_Peace = true;
 	}
 	if (shield and (std::rand() % 100) < Guardian::__Counter) {
-		std::cout << this->getLog() << RE << *this << " counter attack!" << RC << std::endl;
+		std::ostringstream counter;
+		std::cout << this->getLog();
+		counter << RE << *this << " counter attack!" << RC << std::endl;
+		slow_print(counter, 50000);
 		this->_Counter = true;
 		this->_AttackDamage = 12;
 		this->_Stamina++;
@@ -157,7 +166,7 @@ void	Guardian::takeDamage(unsigned int amount) {
 }
 
 void	Guardian::guardGate( void ) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 	
 	ss.str(std::string());
 	if (!this->_Stamina)
@@ -169,13 +178,15 @@ void	Guardian::guardGate( void ) {
 	}
 	else
 		ss << CY << *this << " is already FIGHTING DEFENSIVELY\n\t\t\t\t\tShield Capacity left: " << Guardian::__ShieldCapacity - this->_Absorbed << RC << std::endl;
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog();
+	slow_print(ss, 50000);
 }
 
 void Guardian::attack(std::string const target) {
-	Character		*Char;
-	unsigned int	Damages = 2 + (std::rand() % this->_AttackDamage) + (std::rand() % this->_AttackDamage);
-	bool			attack = false;
+	Character			*Char;
+	unsigned int		Damages = 2 + (std::rand() % this->_AttackDamage) + (std::rand() % this->_AttackDamage);
+	bool				attack = false;
+	std::ostringstream ss;
 	
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
@@ -187,7 +198,8 @@ void Guardian::attack(std::string const target) {
 		while (Char and target.compare(Char->getName()))
 			Char = Char->Next;
 		if (Char) {
-			std::cout << RE << *this << " slam " << target << " with his shield for " << Damages << " Damages!" << RC << std::endl;
+			ss << RE << *this << " slam " << target << " with his shield for " << Damages << " Damages!" << RC << std::endl;
+			slow_print(ss, 50000);
 			Char->tryDodge();
 			Char->takeDamage(Damages);
 			if (Char->getCounter()) {
@@ -196,14 +208,16 @@ void Guardian::attack(std::string const target) {
 			}
 		}
 		else {
-			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			ss << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			slow_print(ss, 50000);
 		}
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
@@ -280,6 +294,8 @@ std::string	Guardian::askAction( void ) {
 }
 
 void	Guardian::GuardPlayerTurn( Character *Computer ) {
+	std::ostringstream ss;
+
 	switch (PlayerAction()) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
@@ -296,7 +312,9 @@ void	Guardian::GuardPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog();
+			ss << RE << *this << " forfeit the duel" << RC << std::endl;
+			slow_print(ss, 50000);
 			break;
 		default:
 			this->attack(Computer->getName());

@@ -12,12 +12,12 @@ class Guardian : public Character {
 		bool			_GateKeeper;
 		unsigned int	_Absorbed;
 
-		static const unsigned int	__HitPoints = 50;
+		static const unsigned int	__HitPoints = 25;
 		static const unsigned int	__Stamina = 20;
 		static const unsigned int	__AttackDamage = 6;
 		static const int			__Dodge = 5;
 		static const unsigned int	__ShieldCapacity = 10;
-		static const int			__PeaceAura = 15;
+		static const int			__PeaceAura = 10;
 		static const int			__Counter = 33;
 
 	public:

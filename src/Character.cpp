@@ -190,7 +190,7 @@ std::ostream	&operator<<( std::ostream & ostream, Character const & src ) {
 }
 
 std::string	Character::getLog( void ) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 
 	ss.str(std::string());
 	ss << "\t[ " << std::setw(12) << std::left << *this << RE << " " << std::setw(3) << std::right << this->_HitPoints << "  " << CY << std::setw(3) << std::right << this->_Stamina << RC << " ]\t";
@@ -198,7 +198,7 @@ std::string	Character::getLog( void ) {
 }
 
 void	Character::Heal( unsigned int const amount ) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 	
 	ss.str(std::string());
 	if (this->_HitPoints and this->_Stamina) {
@@ -223,11 +223,12 @@ void	Character::Heal( unsigned int const amount ) {
 		else
 			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
 	}
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog();
+	slow_print(ss, 50000);
 }
 
 void		Character::takeDamage(unsigned int const amount) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 
 	ss.str(std::string());
 	if (!this->_HitPoints)
@@ -250,14 +251,16 @@ void		Character::takeDamage(unsigned int const amount) {
 	}
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog();
+	slow_print(ss, 50000);
 	this->_hasDodged = false;
 }
 
 void Character::attack(std::string const target) {
-	Character		*Char;
-	unsigned int	Damages;
-	bool			attack = false;
+	Character			*Char;
+	unsigned int		Damages;
+	bool				attack = false;
+	std::ostringstream	ss;
 	
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
@@ -270,7 +273,8 @@ void Character::attack(std::string const target) {
 			Char = Char->Next;
 		if (Char) {
 			Damages = 1 + (std::rand() % this->_AttackDamage);
-			std::cout << RE << *this << " slam " << target << " for " << Damages << " Damages!" << RC << std::endl;
+			ss << RE << *this << " slam " << target << " for " << Damages << " Damages!" << RC << std::endl;
+			slow_print(ss, 50000);
 			Char->tryDodge();
 			Char->takeDamage(Damages);
 			if (Char->getCounter()) {
@@ -279,26 +283,35 @@ void Character::attack(std::string const target) {
 			}
 		}
 		else {
-			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			ss << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			slow_print(ss, 50000);
 		}
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
 void	Character::Bleeding( void ) {
+	std::ostringstream ss;
 	if (this->_Bleed and this->_HitPoints) {
 		if (this->_Bleed <= this->_HitPoints)
 			this->_HitPoints -= this->_Bleed;
 		else
 			this->_HitPoints = 0;
-		std::cout << this->getLog() << RE << *this << " is BLEEDING and loss " << this->_Bleed << " HP..." << RC << std::endl;
-		if (!this->_HitPoints)
-			std::cout << this->getLog() << RE << *this << " BLED to DEATH." << RC << std::endl;
+		std::cout << this->getLog();
+		ss << RE << *this << " is BLEEDING and loss " << this->_Bleed << " HP..." << RC << std::endl;
+		slow_print(ss, 50000);
+		if (!this->_HitPoints) {
+			std::cout << this->getLog(); 
+			std::ostringstream death;
+			death << RE << *this << " BLED to DEATH." << RC << std::endl;
+			slow_print(death, 50000);
+		}
 		this->_Bleed++;
 	}
 }
@@ -313,33 +326,44 @@ bool	Character::tryDodge( void ) {
 }
 
 void	Character::Dodging( void ) {
+	std::ostringstream ss;
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
 		this->_Dodge += 20;
 		this->_Dodging = true;
-		std::cout << this->getLog() << BL << *this << " focus on DODGING" << RC << std::endl;
+		std::cout << this->getLog();
+		ss << BL << *this << " focus on DODGING" << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 	else {
-		if (!this->_HitPoints)
-			std::cout << this->getLog() << RE << *this << " has been killed..." << RC << std::endl;
-		else
-			std::cout << this->getLog() << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		if (!this->_HitPoints) {
+			std::cout << this->getLog();
+			ss << RE << *this << " has been killed..." << RC << std::endl;
+		}
+		else {
+			std::cout << this->getLog();
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		}
+		slow_print(ss, 50000);
 	}
 }
 
 void	Character::Resting( void ) {
 	int	amount = 2 + (std::rand() % 6) + (std::rand() % 6);
+	std::ostringstream ss;
 
 	if (this->_Stamina + amount > this->_MaxStam)
 		amount = this->_MaxStam - this->_Stamina;
 	if (this->_HitPoints) {
 		this->_Stamina += amount;
-		std::cout << getLog() << CY << *this << " REST and regain " << amount << " Stamina" << RC << std::endl;
+		std::cout << getLog();
+		ss << CY << *this << " RESTS and regains " << amount << " Stamina" << RC << std::endl;
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 	}
+	slow_print(ss, 50000);
 }
 
 void	Character::CharComputerTurn( Character *Player ) {
@@ -396,13 +420,16 @@ int	Character::PlayerAction( void ) {
 		}
 		if (!cmd.compare("EXIT") or !cmd.compare("GIVE UP") or std::cin.eof())
 			return (FORFEIT);
-		std::cout << RE << "\tInvalid command" << RC << std::endl;
+		std::ostringstream ss;
+		ss << RE << "\tInvalid command" << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 
 	return (ATTACK);
 }
 
 void	Character::CharPlayerTurn( Character *Computer ) {
+	std::ostringstream ss;
 	switch (PlayerAction()) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + 1);
@@ -416,7 +443,9 @@ void	Character::CharPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog();
+			ss << RE << *this << " forfeit the duel" << RC << std::endl;
+			slow_print(ss, 50000);
 			break;
 		default:
 			this->attack(Computer->getName());
@@ -440,8 +469,11 @@ bool	Character::checkPeace( Character *Opponent ) {
 			this->_Stamina += rest;
 		else
 			this->_Stamina = this->_MaxStam;
-		std::cout << this->getLog() << CY << *this << " is feeling peacefull and just want to rest" << std::endl;
-		std::cout << "\t\t\t\t\t" << *this << " regain " << heal << " Hit Points and " << rest << " Stamina" << RC << std::endl;
+		std::cout << this->getLog();
+		std::ostringstream ss;
+		ss << CY << *this << " is feeling peacefull and just wants to rest" << std::endl;
+		ss << "\t\t\t\t\t" << *this << " regains " << heal << " Hit Points and " << rest << " Stamina" << RC << std::endl;
+		slow_print(ss, 50000);
 		Opponent->setPeace(false);
 	}
 	return (Peaceful);

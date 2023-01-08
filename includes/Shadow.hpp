@@ -11,7 +11,7 @@ class Shadow : public Character {
 
 		bool	_Hiding;
 		
-		static const unsigned int	__HitPoints = 40;
+		static const unsigned int	__HitPoints = 20;
 		static const unsigned int	__Stamina = 20;
 		static const unsigned int	__AttackDamage = 6;
 		static const int			__Dodge = 20;

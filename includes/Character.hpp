@@ -125,4 +125,6 @@ class Character {
 
 std::ostream	&operator<<( std::ostream & ostream, Character const & src );
 
+void	slow_print(std::ostringstream & raw, int delay);
+
 #endif

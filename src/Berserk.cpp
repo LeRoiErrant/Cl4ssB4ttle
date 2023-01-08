@@ -102,6 +102,7 @@ std::string	Berserk::askAction( void ) {
 }
 
 void	Berserk::BersPlayerTurn( Character *Computer ) {
+	std::ostringstream ss;
 	switch (PlayerAction()) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
@@ -118,7 +119,9 @@ void	Berserk::BersPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog(); 
+			ss << RE << *this << " forfeit the duel" << RC << std::endl;
+			slow_print(ss, 50000);
 			break;
 		default:
 			this->attack(Computer->getName());
@@ -128,19 +131,21 @@ void	Berserk::BersPlayerTurn( Character *Computer ) {
 
 std::string	Berserk::DamageReduction(unsigned int & Damages) {
 	unsigned int		Old = Damages;
-	std::stringstream	ss;
+	std::ostringstream	ss;
 
 	ss.str(std::string());
 	if (Damages < this->_RD)
 		Damages = 0;
 	else
 		Damages -= this->_RD;
-	ss << this->getLog() << DR << *this << "'s Hard Skin reduced Damages from " << Old << " to " << Damages << RC << std::endl;
+	std::cout << this->getLog(); 
+	ss << DR << *this << "'s Hard Skin reduced Damages from " << Old << " to " << Damages << RC << std::endl;
+	slow_print(ss, 50000);
 	return (ss.str());
 }
 
 void		Berserk::takeDamage(unsigned int const amount) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 	unsigned int		Damages = amount;
 
 	ss.str(std::string());
@@ -149,7 +154,7 @@ void		Berserk::takeDamage(unsigned int const amount) {
 	else if (this->_hasDodged)
 		ss << BL << *this << " DODGE the attack and took no Damage!" << RC << std::endl;
 	else {
-		std::cout << this->DamageReduction(Damages);
+		this->DamageReduction(Damages);
 		if (Damages == 0)
 			ss << YE << *this << " was attacked but took no Damage!" << RC << std::endl;
 		else {
@@ -166,7 +171,8 @@ void		Berserk::takeDamage(unsigned int const amount) {
 	}
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog(); 
+	slow_print(ss, 50000);
 	if (this->_HitPoints < (this->_MaxHP / 2))
 		this->enrage();
 	this->_hasDodged = false;
@@ -184,7 +190,10 @@ void	Berserk::enrage( void ) {
 		this->_Rage = true;
 		this->_RD *= 2;
 		this->_RageDamage = 3;
-		std::cout << this->getLog() << DR << *this << " begin to " << RE << "RAGE" << RC <<std::endl;
+		std::ostringstream ss;
+		std::cout << this->getLog(); 
+		ss << DR << *this << " begin to " << RE << "RAGE" << RC <<std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
@@ -193,7 +202,10 @@ void	Berserk::calmDown( void ) {
 		this->_Rage = false;
 		this->_RD /= 2;
 		this->_RageDamage = 0;
-		std::cout << this->getLog() << DR << *this << " calmed down..." << RC << std::endl;
+		std::ostringstream ss;
+		std::cout << this->getLog();
+		ss << DR << *this << " calmed down..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
@@ -206,13 +218,15 @@ void Berserk::attack(std::string const target) {
 		this->_Stamina--;
 		attack = true;
 	}
+	std::ostringstream ss;
 	std::cout << this->getLog();
 	if (attack) {
 		Char = Character::FirstChar;
 		while (Char and target.compare(Char->getName()))
 			Char = Char->Next;
 		if (Char) {
-			std::cout << RE << *this << " pounce on " << target << " with his axe for " << Damages << " Damages!" << RC << std::endl;
+			ss << RE << *this << " pounce on " << target << " with his axe for " << Damages << " Damages!";
+			slow_print(ss, 50000);
 			Char->tryDodge();
 			Char->takeDamage(Damages);
 			if (Char->getCounter()) {
@@ -221,14 +235,16 @@ void Berserk::attack(std::string const target) {
 			}
 		}
 		else {
-			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			ss << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			slow_print(ss, 50000);
 		}
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
@@ -255,6 +271,8 @@ void	Berserk::headbutt( std::string const target) {
 		this->_Stamina--;
 		attack = true;
 	}
+	std::ostringstream ss;
+	std::cout << this->getLog();
 	if (attack) {
 		Char = Character::FirstChar;
 		while (Char and target.compare(Char->getName()))
@@ -267,7 +285,8 @@ void	Berserk::headbutt( std::string const target) {
 				else
 					Char->setStamina(0);
 			}
-			std::cout << this->getLog() << RE << *this << " try to HEADBUTT " << target << "\n\t\t\t\t\t" << *this << " loose " << Damages[FIGHTER] << " HP\n\t\t\t\t\tand attack " << target << " for " << Damages[OPPONENT] << " Damages and " << Exhaust << " Stamina Loss" << RC << std::endl;
+			ss << RE << *this << " try to HEADBUTT " << target << "\n\t\t\t\t\t" << *this << " loose " << Damages[FIGHTER] << " HP\n\t\t\t\t\tand attack " << target << " for " << Damages[OPPONENT] << " Damages and " << Exhaust << " Stamina Loss" << RC << std::endl;
+			slow_print(ss, 50000);
 			Char->takeDamage(Damages[OPPONENT]);
 			if (Char->getCounter()) {
 				Char->attack(this->getName());
@@ -275,14 +294,16 @@ void	Berserk::headbutt( std::string const target) {
 			}
 		}
 		else {
-			std::cout << this->getLog() << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			ss << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			slow_print(ss, 50000);
 		}
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << this->getLog() << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << this->getLog() << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 

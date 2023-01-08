@@ -106,6 +106,8 @@ std::string	Shadow::askAction( void ) {
 }
 
 void	Shadow::ShadPlayerTurn( Character *Computer ) {
+	std::ostringstream ss;
+	
 	switch (PlayerAction()) {
 		case HEAL:
 			this->Heal((std::rand() % 4) + (std::rand() % 4) + 3);
@@ -122,7 +124,9 @@ void	Shadow::ShadPlayerTurn( Character *Computer ) {
 		case FORFEIT:
 			this->_HitPoints = 0;
 			this->_Stamina = 0;
-			std::cout << "\n" << this->getLog() << RE << *this << " forfeit the duel" << RC << std::endl;
+			std::cout << "\n" << this->getLog();
+			ss << RE << *this << " forfeit the duel" << RC << std::endl;
+			slow_print(ss, 50000);
 			break;
 		default:
 			this->attack(Computer->getName());
@@ -131,7 +135,8 @@ void	Shadow::ShadPlayerTurn( Character *Computer ) {
 }
 
 void		Shadow::takeDamage(unsigned int const amount) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
+	bool				nHide = false;
 
 	ss.str(std::string());
 	if (!this->_HitPoints)
@@ -151,13 +156,16 @@ void		Shadow::takeDamage(unsigned int const amount) {
 			else {
 				ss << YE << "Ouch! " << *this << " took " << amount << " Damages! " << *this << " got " << this->_HitPoints << " HP left!" << RC << std::endl;
 				if (this->_Hiding)
-					ss << this->notHiding();
+					nHide = true;
 			}
 		}
 	}
 	if (!this->_HitPoints)
 		this->_Stamina = 0;
-	std::cout << this->getLog() << ss.str();
+	std::cout << this->getLog();
+	slow_print(ss, 50000);
+	if (nHide)
+		this->notHiding();
 	this->_hasDodged = false;
 }
 
@@ -168,7 +176,6 @@ std::string	Shadow::sneakAttack( unsigned int & Damages, std::string const targe
 	if (this->_Hiding) {
 		Damages += (std::rand() % this->_AttackDamage) + (std::rand() % 6) + (std::rand() % 6) + 3;
 		ss << " strike from the Dark and stab "<< target << " for " << Damages << " Damages!" << RC << std::endl;
-		ss << this->notHiding();
 	}
 	else {
 		Damages += (std::rand() % this->_AttackDamage) + 1;
@@ -178,10 +185,12 @@ std::string	Shadow::sneakAttack( unsigned int & Damages, std::string const targe
 }
 
 void Shadow::attack(std::string const target) {
-	Character		*Char;
-	unsigned int	OppHP;
-	unsigned int	Damages;
-	bool			attack = false;
+	Character			*Char;
+	unsigned int		OppHP;
+	unsigned int		Damages;
+	bool				attack = false;
+	std::ostringstream	ss;
+	bool				nHide = false;
 	
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
@@ -195,7 +204,10 @@ void Shadow::attack(std::string const target) {
 		if (Char) {
 			OppHP = Char->getHitPoints();
 			Damages = Char->getBleed();
-			std::cout << RE << *this << this->sneakAttack(Damages, target);
+			ss << RE << *this << this->sneakAttack(Damages, target);
+			slow_print(ss, 50000);
+			if (this->_Hiding)
+				this->notHiding();
 			Char->tryDodge();
 			Char->takeDamage(Damages);
 			if (Char->getCounter()) {
@@ -206,29 +218,35 @@ void Shadow::attack(std::string const target) {
 					Char->setBleed(Char->getBleed() + 1);
 		}
 		else {
-			std::cout << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			ss << YE << "No Target named " << target << " on the Battlefield. The attack failed !" << RC << std::endl;
+			slow_print(ss, 50000);
 		}
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
 void	Shadow::hide( void ) {
+	std::ostringstream	ss;
 	if (this->_Stamina and this->_HitPoints) {
 		this->_Hiding = true;
 		this->_Dodge = 66;
-		std::cout << getLog() << DG << *this << " is HIDING in the Shadows..." << RC << std::endl;
+		std::cout << getLog();
+		ss << DG << *this << " is HIDING in the Shadows..." << RC << std::endl;
+		slow_print(ss, 50000);
 		this->_Stamina--;
 	}
 	else {
 		if (!this->_HitPoints)
-			std::cout << RE << *this << " has been killed..." << RC << std::endl;
+			ss << RE << *this << " has been killed..." << RC << std::endl;
 		else
-			std::cout << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+			ss << CY << *this << " has no Stamina left and can't move anymore..." << RC << std::endl;
+		slow_print(ss, 50000);
 	}
 }
 
@@ -237,7 +255,9 @@ std::string	Shadow::notHiding( void ) {
 
 	ss.str(std::string());
 	this->_Hiding = false;
-	ss << this->getLog() << LG << *this << " is not hiding anymore" << RC << std::endl;
+	std::cout << this->getLog();
+	ss << LG << *this << " is not hiding anymore" << RC << std::endl;
+	slow_print(ss, 50000);
 	this->_Dodge = Shadow::__Dodge;
 	return (ss.str());
 }
@@ -251,7 +271,7 @@ void	Shadow::refreshDodge( void ) {
 		if (this->_Dodge > Shadow::__Dodge)
 			this->_Dodge -= 15;
 	if (this->_Hiding and this->_Dodge <= Shadow::__Dodge + 1)
-		std::cout << this->notHiding();
+		this->notHiding();
 }
 
 void	Shadow::NewTurn( int Fighter, Character *Opponent ) {

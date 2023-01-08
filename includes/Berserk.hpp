@@ -12,8 +12,9 @@ class Berserk : public Character {
 		bool			_Rage;
 		unsigned int	_RD;
 		unsigned int	_RageDamage;
+		
 
-		static const unsigned int	__HitPoints = 60;
+		static const unsigned int	__HitPoints = 30;
 		static const unsigned int	__Stamina = 20;
 		static const unsigned int	__AttackDamage = 12;
 		static const int			__Dodge = 5;

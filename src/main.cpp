@@ -1,67 +1,132 @@
+
 #include "../includes/Character.hpp"
 #include "../includes/Shadow.hpp"
 #include "../includes/Berserk.hpp"
 #include "../includes/Guardian.hpp"
 
+void	slow_print(std::ostringstream & raw, int delay) {
+	std::string msg = raw.str();
+	for (size_t i = 0; i < msg.size(); i++) {
+		std::cout << msg[i];
+		if (msg[i] != ' ' or msg[i] != '\t' or msg[i] != '\n') {
+			std::cout.flush();
+			usleep(delay);
+		}
+	}
+	std::cout << RC << std::endl;
+}
+
 void	YouWon( void ) {
 	std::cout << std::endl;
 	std::cout << "\t\t\t" << GR << "██╗   ██╗ ██████╗ ██╗   ██╗    ██╗    ██╗ ██████╗ ███╗   ██╗██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t" << GR << "╚██╗ ██╔╝██╔═══██╗██║   ██║    ██║    ██║██╔═══██╗████╗  ██║██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t" << GR << " ╚████╔╝ ██║   ██║██║   ██║    ██║ █╗ ██║██║   ██║██╔██╗ ██║██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t" << GR << "  ╚██╔╝  ██║   ██║██║   ██║    ██║███╗██║██║   ██║██║╚██╗██║╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t" << GR << "   ██║   ╚██████╔╝╚██████╔╝    ╚███╔███╔╝╚██████╔╝██║ ╚████║██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t" << GR << "   ╚═╝    ╚═════╝  ╚═════╝      ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << std::endl;
 }
 
 void	Winner ( void ) {
 	std::cout << std::endl;
 	std::cout << "\t\t\t     " << GR << " ██╗    ██╗██╗███╗   ██╗███╗   ██╗███████╗██████╗ ██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << GR << " ██║    ██║██║████╗  ██║████╗  ██║██╔════╝██╔══██╗██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << GR << " ██║ █╗ ██║██║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << GR << " ██║███╗██║██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << GR << " ╚███╔███╔╝██║██║ ╚████║██║ ╚████║███████╗██║  ██║██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
  	std::cout << "\t\t\t     " << GR << "  ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝ " << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << std::endl;
 }
 
 void	Looser ( void ) {
 	std::cout << std::endl;
 	std::cout << "\t\t\t     " << RE << "██╗      ██████╗  ██████╗ ███████╗███████╗██████╗ ██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << RE << "██║     ██╔═══██╗██╔═══██╗██╔════╝██╔════╝██╔══██╗██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << RE << "██║     ██║   ██║██║   ██║███████╗█████╗  ██████╔╝██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << RE << "██║     ██║   ██║██║   ██║╚════██║██╔══╝  ██╔══██╗╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << RE << "███████╗╚██████╔╝╚██████╔╝███████║███████╗██║  ██║██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t\t     " << RE << "╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << std::endl;
 }
 
 void	ItsaDraw( void ) {
 	std::cout << std::endl;
 	std::cout << "\t\t   " << YE << "██╗████████╗███████╗     █████╗     ██████╗ ██████╗  █████╗ ██╗    ██╗██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t   " << YE << "██║╚══██╔══╝██╔════╝    ██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗██║    ██║██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t   " << YE << "██║   ██║   ███████╗    ███████║    ██║  ██║██████╔╝███████║██║ █╗ ██║██║" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t   " << YE << "██║   ██║   ╚════██║    ██╔══██║    ██║  ██║██╔══██╗██╔══██║██║███╗██║╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t   " << YE << "██║   ██║   ███████║    ██║  ██║    ██████╔╝██║  ██║██║  ██║╚███╔███╔╝██╗" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << "\t\t   " << YE << "╚═╝   ╚═╝   ╚══════╝    ╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝" << RC << std::endl;
+	usleep(250000);
+	std::cout.flush();
 	std::cout << std::endl;
 }
 
 void	versusBattle( Character *Player, Character *Computer ) {
-	bool		StaminaLeft;
-	bool		KnockOut;
-	int			Turn;
+	bool			StaminaLeft;
+	bool			KnockOut;
+	int				Turn;
+	std::ostringstream	ss;
 
 	StaminaLeft = Player->getStamina() or Computer->getStamina();
 	KnockOut = !Player->getHitPoints() or !Computer->getHitPoints();
 	Turn = (std::rand() % 2);
 	if (Turn == COMPUTER)
-		std::cout << BOLD << ITAL << "Computer " << *Computer << " goes First\n" << RC << std::endl;
+		ss << BOLD << ITAL << "Computer " << *Computer << " goes First\n" << RC << std::endl;
 	else
-		std::cout << BOLD << ITAL << "Player " << *Player << " goes First" << RC << std::endl;
+		ss << BOLD << ITAL << "Player " << *Player << " goes First" << RC << std::endl;
+	slow_print(ss, 50000);
 	while (StaminaLeft and !KnockOut) {
 		if (Turn == COMPUTER) {
-			std::cout << BOLD << ITAL << "\n\t\tComputer " << *Computer << " is thinking\n" << RC << std::endl;
+			std::ostringstream ss;
+			ss << BOLD << ITAL << "\t\tComputer " << *Computer << " is thinking...\n";
+			slow_print(ss, 50000);
 			Computer->NewTurn(COMPUTER, Player);
 			Turn = PLAYER;
 		}
@@ -171,9 +236,9 @@ bool	askReplay( void ) {
 
 void	CharacterClassInfo( void ) {
 	std::cout << "\t\t" << BOLD << UNDRL << " " << std::setw(15) << "CHARACTER CLASS" << " | " << std::setw(10) << "Hit Points" << " | " << std::setw(6) << "ATTACK" << " | " << std::setw(8) << "ACTIVE" << " | " << std::setw(12) << "PASSIVE(1)" << " | " << std::setw(15) << "PASSIVE(2)" << " " << RC << std::endl;
-	std::cout << "\t\t " << BOLD << std::setw(5) << "1." << DGB << std::setw(10) << "SHADOW" << WH << " | " << std::setw(10) << "40" << " | " << std::setw(6) << "D4" << " | " << std::setw(8) << "HIDE" << " | " << std::setw(12) << "SNEAK ATTACK" << " | " << std::setw(15) << "BLEEDING STRIKE" << std::endl;
-	std::cout << "\t\t " << BOLD << std::setw(5) << "2." << RE << std::setw(10) << "BERSERK" << WH << " | " << std::setw(10) << "60" << " | " << std::setw(6) << "D12" << " | " << std::setw(8) << "HEADBUTT" << " | " << std::setw(12) << "RAGE" << " | " << std::setw(15) << "THICK SKIN" << std::endl;
-	std::cout << "\t\t " << BOLD << std::setw(5) << "3." << CY << std::setw(10) << "GUARDIAN" << WH << " | " << std::setw(10) << "50" << " | " << std::setw(6) << "D8" << " | " << std::setw(8) << "GUARD" << " | " << std::setw(12) << "COUNTER" << " | " << std::setw(15) << "PEACEFUL AURA" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "1." << DGB << std::setw(10) << "SHADOW" << WH << " | " << std::setw(10) << "20" << " | " << std::setw(6) << "D4" << " | " << std::setw(8) << "HIDE" << " | " << std::setw(12) << "SNEAK ATTACK" << " | " << std::setw(15) << "BLEEDING STRIKE" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "2." << RE << std::setw(10) << "BERSERK" << WH << " | " << std::setw(10) << "30" << " | " << std::setw(6) << "D12" << " | " << std::setw(8) << "HEADBUTT" << " | " << std::setw(12) << "RAGE" << " | " << std::setw(15) << "THICK SKIN" << std::endl;
+	std::cout << "\t\t " << BOLD << std::setw(5) << "3." << CY << std::setw(10) << "GUARDIAN" << WH << " | " << std::setw(10) << "25" << " | " << std::setw(6) << "D8" << " | " << std::setw(8) << "GUARD" << " | " << std::setw(12) << "COUNTER" << " | " << std::setw(15) << "PEACEFUL AURA" << std::endl;
 	std::cout << std::endl;
 }
 
