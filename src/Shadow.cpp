@@ -190,7 +190,6 @@ void Shadow::attack(std::string const target) {
 	unsigned int		Damages;
 	bool				attack = false;
 	std::ostringstream	ss;
-	bool				nHide = false;
 	
 	if (this->_HitPoints and this->_Stamina) {
 		this->_Stamina--;
@@ -251,7 +250,7 @@ void	Shadow::hide( void ) {
 }
 
 std::string	Shadow::notHiding( void ) {
-	std::stringstream	ss;
+	std::ostringstream	ss;
 
 	ss.str(std::string());
 	this->_Hiding = false;
